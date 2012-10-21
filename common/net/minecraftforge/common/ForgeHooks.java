@@ -239,7 +239,23 @@ public class ForgeHooks
     {
         ItemStack result = null;
         boolean isCreative = player.capabilities.isCreativeMode;
+        // TODO fix for item frames
+/*        else if (this.objectMouseOver.entityHit instanceof EntityItemFrame)
+        {
+            EntityItemFrame var10 = (EntityItemFrame)this.objectMouseOver.entityHit;
 
+            if (var10.func_82335_i() == null)
+            {
+                var2 = Item.field_82802_bI.shiftedIndex;
+            }
+            else
+            {
+                var2 = var10.func_82335_i().itemID;
+                var3 = var10.func_82335_i().getItemDamage();
+                var4 = true;
+            }
+        }
+*/
         if (target.typeOfHit == EnumMovingObjectType.TILE)
         {
             int x = target.blockX;
