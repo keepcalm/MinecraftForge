@@ -1,6 +1,6 @@
 --- ../src_base/minecraft/net/minecraft/entity/player/EntityPlayer.java
 +++ ../src_work/minecraft/net/minecraft/entity/player/EntityPlayer.java
-@@ -55,8 +55,21 @@
+@@ -55,8 +55,22 @@
  import net.minecraft.world.World;
  import net.minecraft.world.chunk.IChunkProvider;
  
@@ -11,6 +11,7 @@
 +import net.minecraftforge.event.entity.living.LivingHurtEvent;
 +import net.minecraftforge.event.entity.player.AttackEntityEvent;
 +import net.minecraftforge.event.entity.player.EntityInteractEvent;
++import net.minecraftforge.event.entity.player.PlayerCanEditEvent;
 +import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 +import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 +import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -22,7 +23,7 @@
      /** Inventory of the player */
      public InventoryPlayer inventory = new InventoryPlayer(this);
      private InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
-@@ -259,6 +272,7 @@
+@@ -259,6 +273,7 @@
  
              if (var1 == this.itemInUse)
              {
@@ -30,7 +31,7 @@
                  if (this.itemInUseCount <= 25 && this.itemInUseCount % 4 == 0)
                  {
                      this.updateItemUse(var1, 5);
-@@ -497,11 +511,11 @@
+@@ -497,11 +512,11 @@
          this.cameraYaw = 0.0F;
          this.addMountedMovementStat(this.posX - var1, this.posY - var3, this.posZ - var5);
  
@@ -44,7 +45,7 @@
          }
      }
  
-@@ -630,6 +644,9 @@
+@@ -630,6 +645,9 @@
          this.setPosition(this.posX, this.posY, this.posZ);
          this.motionY = 0.10000000149011612D;
  
@@ -54,7 +55,7 @@
          if (this.username.equals("Notch"))
          {
              this.dropPlayerItemWithRandomChoice(new ItemStack(Item.appleRed, 1), true);
-@@ -638,6 +655,20 @@
+@@ -638,6 +656,20 @@
          if (!this.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory"))
          {
              this.inventory.dropAllItems();
@@ -75,7 +76,7 @@
          }
  
          if (par1DamageSource != null)
-@@ -677,7 +708,20 @@
+@@ -677,7 +709,20 @@
       */
      public EntityItem dropOneItem(boolean par1)
      {
@@ -97,7 +98,7 @@
      }
  
      /**
-@@ -686,7 +730,7 @@
+@@ -686,7 +731,7 @@
       */
      public EntityItem dropPlayerItem(ItemStack par1ItemStack)
      {
@@ -106,7 +107,7 @@
      }
  
      /**
-@@ -738,23 +782,39 @@
+@@ -738,23 +783,39 @@
       */
      public void joinEntityItemWithWorld(EntityItem par1EntityItem)
      {
@@ -151,7 +152,7 @@
              {
                  var2 += var5 * 0.08F;
              }
-@@ -784,7 +844,8 @@
+@@ -784,7 +845,8 @@
              var2 /= 5.0F;
          }
  
@@ -161,7 +162,7 @@
      }
  
      /**
-@@ -792,7 +853,7 @@
+@@ -792,7 +854,7 @@
       */
      public boolean canHarvestBlock(Block par1Block)
      {
@@ -170,7 +171,7 @@
      }
  
      /**
-@@ -1079,12 +1140,22 @@
+@@ -1079,12 +1141,22 @@
      {
          if (!this.isEntityInvulnerable())
          {
@@ -194,7 +195,7 @@
              par2 = this.applyPotionDamageCalculations(par1DamageSource, par2);
              this.addExhaustion(par1DamageSource.getHungerDamage());
              this.health -= par2;
-@@ -1125,6 +1196,10 @@
+@@ -1125,6 +1197,10 @@
  
      public boolean interactWith(Entity par1Entity)
      {
@@ -205,7 +206,7 @@
          if (par1Entity.interact(this))
          {
              return true;
-@@ -1168,7 +1243,9 @@
+@@ -1168,7 +1244,9 @@
       */
      public void destroyCurrentEquippedItem()
      {
@@ -215,7 +216,7 @@
      }
  
      /**
-@@ -1185,6 +1262,15 @@
+@@ -1185,6 +1263,15 @@
       */
      public void attackTargetEntityWithCurrentItem(Entity par1Entity)
      {
@@ -231,7 +232,7 @@
          if (par1Entity.canAttackWithItem())
          {
              if (!par1Entity.func_85031_j(this))
-@@ -1348,6 +1434,12 @@
+@@ -1348,6 +1435,12 @@
       */
      public EnumStatus sleepInBedAt(int par1, int par2, int par3)
      {
@@ -244,7 +245,7 @@
          if (!this.worldObj.isRemote)
          {
              if (this.isPlayerSleeping() || !this.isEntityAlive())
-@@ -1387,6 +1479,11 @@
+@@ -1387,6 +1480,11 @@
          {
              int var9 = this.worldObj.getBlockMetadata(par1, par2, par3);
              int var5 = BlockBed.getDirection(var9);
@@ -256,7 +257,7 @@
              float var10 = 0.5F;
              float var7 = 0.5F;
  
-@@ -1457,10 +1554,12 @@
+@@ -1457,10 +1555,12 @@
          ChunkCoordinates var4 = this.playerLocation;
          ChunkCoordinates var5 = this.playerLocation;
  
@@ -273,7 +274,7 @@
  
              if (var5 == null)
              {
-@@ -1497,7 +1596,9 @@
+@@ -1497,7 +1597,9 @@
       */
      private boolean isInBed()
      {
@@ -284,7 +285,7 @@
      }
  
      /**
-@@ -1512,9 +1613,12 @@
+@@ -1512,9 +1614,12 @@
          var3.loadChunk(par1ChunkCoordinates.posX - 3 >> 4, par1ChunkCoordinates.posZ + 3 >> 4);
          var3.loadChunk(par1ChunkCoordinates.posX + 3 >> 4, par1ChunkCoordinates.posZ + 3 >> 4);
  
@@ -300,7 +301,7 @@
              return var8;
          }
          else
-@@ -1536,8 +1640,11 @@
+@@ -1536,8 +1641,11 @@
      {
          if (this.playerLocation != null)
          {
@@ -314,7 +315,7 @@
  
              switch (var2)
              {
-@@ -1846,7 +1953,7 @@
+@@ -1846,7 +1954,7 @@
          {
              if (par1ItemStack.getItem().requiresMultipleRenderPasses())
              {
@@ -323,7 +324,7 @@
              }
  
              if (this.itemInUse != null && par1ItemStack.itemID == Item.bow.itemID)
-@@ -1868,6 +1975,7 @@
+@@ -1868,6 +1976,7 @@
                      return 101;
                  }
              }
@@ -331,7 +332,18 @@
          }
  
          return var3;
-@@ -2088,6 +2196,14 @@
+@@ -2026,6 +2135,10 @@
+ 
+     public boolean canPlayerEdit(int par1, int par2, int par3, int par4, ItemStack par5ItemStack)
+     {
++        if (MinecraftForge.EVENT_BUS.post(new PlayerCanEditEvent(this, par5ItemStack, par1, par2, par3, par4)))
++        {
++            return false;
++        }
+         return this.capabilities.allowEdit ? true : (par5ItemStack != null ? par5ItemStack.func_82835_x() : false);
+     }
+ 
+@@ -2088,6 +2201,14 @@
          }
  
          this.theInventoryEnderChest = par1EntityPlayer.theInventoryEnderChest;

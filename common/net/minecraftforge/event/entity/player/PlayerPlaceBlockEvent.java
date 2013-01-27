@@ -20,7 +20,6 @@ public class PlayerPlaceBlockEvent extends PlayerEvent
     
     public final ForgeDirection sideHit;
     
-    public final EntityPlayer player;
     public final ItemStack stackUsed;
     
     public final boolean canBuild;
@@ -45,7 +44,6 @@ public class PlayerPlaceBlockEvent extends PlayerEvent
         
         this.sideHit = ForgeDirection.getOrientation(side);
         
-        this.player = player;
         this.stackUsed = stack;
         
         this.canBuild = player.canPlayerEdit(x, y, z, side, stackUsed);
