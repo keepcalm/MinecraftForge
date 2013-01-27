@@ -1,6 +1,14 @@
 --- ../src_base/minecraft/net/minecraft/item/ItemBlock.java
 +++ ../src_work/minecraft/net/minecraft/item/ItemBlock.java
-@@ -19,6 +19,7 @@
+@@ -8,6 +8,7 @@
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.world.World;
++import net.minecraftforge.event.entity.player.PlayerPlaceBlockEvent;
+ 
+ public class ItemBlock extends Item
+ {
+@@ -19,6 +20,7 @@
          super(par1);
          this.blockID = par1 + 256;
          this.setIconIndex(Block.blocksList[par1 + 256].getBlockTextureFromSide(2));
@@ -8,7 +16,15 @@
      }
  
      /**
-@@ -41,7 +42,8 @@
+@@ -36,12 +38,15 @@
+     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
+     {
+         int var11 = par3World.getBlockId(par4, par5, par6);
+-
++        
++       
++        
+         if (var11 == Block.snow.blockID)
          {
              par7 = 1;
          }
@@ -18,7 +34,25 @@
          {
              if (par7 == 0)
              {
-@@ -92,14 +94,8 @@
+@@ -74,11 +79,16 @@
+             }
+         }
+ 
++
++        
+         if (par1ItemStack.stackSize == 0)
+         {
+             return false;
+         }
+-        else if (!par2EntityPlayer.canPlayerEdit(par4, par5, par6, par7, par1ItemStack))
++        
++        PlayerPlaceBlockEvent ev = new PlayerPlaceBlockEvent(par2EntityPlayer, par1ItemStack, par4, par5, par6, par7, par8, par9, par10);
++        
++        if (!ev.canBuild)
+         {
+             return false;
+         }
+@@ -92,14 +102,8 @@
              int var13 = this.getMetadata(par1ItemStack.getItemDamage());
              int var14 = Block.blocksList[this.blockID].onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, var13);
  
@@ -35,7 +69,7 @@
                  par3World.playSoundEffect((double)((float)par4 + 0.5F), (double)((float)par5 + 0.5F), (double)((float)par6 + 0.5F), var12.stepSound.getPlaceSound(), (var12.stepSound.getVolume() + 1.0F) / 2.0F, var12.stepSound.getPitch() * 0.8F);
                  --par1ItemStack.stackSize;
              }
-@@ -125,7 +121,8 @@
+@@ -125,7 +129,8 @@
          {
              par5 = 1;
          }
@@ -45,7 +79,7 @@
          {
              if (par5 == 0)
              {
-@@ -190,4 +187,28 @@
+@@ -190,4 +195,28 @@
      {
          Block.blocksList[this.blockID].getSubBlocks(par1, par2CreativeTabs, par3List);
      }
