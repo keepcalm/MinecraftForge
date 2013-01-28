@@ -1,0 +1,76 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorDefaultDispenseItem.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorDefaultDispenseItem.java
+@@ -4,7 +4,10 @@
+ import net.minecraft.entity.item.EntityItem;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
+ import net.minecraft.world.World;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
+ 
+ public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem
+ {
+@@ -25,17 +28,19 @@
+     protected ItemStack dispenseStack(IBlockSource par1IBlockSource, ItemStack par2ItemStack)
+     {
+         EnumFacing var3 = EnumFacing.getFront(par1IBlockSource.func_82620_h());
+-        IPosition var4 = BlockDispenser.func_82525_a(par1IBlockSource);
+         ItemStack var5 = par2ItemStack.splitStack(1);
+-        func_82486_a(par1IBlockSource.getWorld(), var5, 6, var3, var4);
++        if (!func_82486_a(par1IBlockSource.getWorld(), var5, 6, var3, par1IBlockSource)) {
++            par2ItemStack.stackSize++;
++        }
+         return par2ItemStack;
+     }
+ 
+-    public static void func_82486_a(World par0World, ItemStack par1ItemStack, int par2, EnumFacing par3EnumFacing, IPosition par4IPosition)
++    public static boolean func_82486_a(World par0World, ItemStack par1ItemStack, int par2, EnumFacing par3EnumFacing, IBlockSource par4IBlockSource)
+     {
+-        double var5 = par4IPosition.getX();
+-        double var7 = par4IPosition.getY();
+-        double var9 = par4IPosition.getZ();
++        IPosition ipos = BlockDispenser.func_82525_a(par4IBlockSource);
++        double var5 = ipos.getX();
++        double var7 = ipos.getY();
++        double var9 = ipos.getZ();
+         EntityItem var11 = new EntityItem(par0World, var5, var7 - 0.3D, var9, par1ItemStack);
+         double var12 = par0World.rand.nextDouble() * 0.1D + 0.2D;
+         var11.motionX = (double)par3EnumFacing.getFrontOffsetX() * var12;
+@@ -44,7 +49,36 @@
+         var11.motionX += par0World.rand.nextGaussian() * 0.007499999832361937D * (double)par2;
+         var11.motionY += par0World.rand.nextGaussian() * 0.007499999832361937D * (double)par2;
+         var11.motionZ += par0World.rand.nextGaussian() * 0.007499999832361937D * (double)par2;
++        
++        BlockDispenseEvent ev = new BlockDispenseEvent(par4IBlockSource.getXInt(), par4IBlockSource.getYInt(), par4IBlockSource.getZInt(), par4IBlockSource.getWorld(), par1ItemStack, Vec3.vec3dPool.getVecFromPool(var11.motionX, var11.motionY, var11.motionZ), new BehaviorDefaultDispenseItem());
++        
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return false;
++            }
++            
++            if (!ev.toDispense.equals(var11.getEntityItem())) {
++                var11.func_92058_a(ev.toDispense);
++            }
++            
++            var11.motionX = ev.velocity.xCoord;
++            var11.motionY = ev.velocity.yCoord;
++            var11.motionZ = ev.velocity.zCoord;
++            
++            
++            IBehaviorDispenseItem idispensebehavior = (IBehaviorDispenseItem) BlockDispenser.dispenseBehaviorRegistry.func_82594_a(ev.toDispense.getItem());
++
++            if (idispensebehavior != IBehaviorDispenseItem.itemDispenseBehaviorProvider && idispensebehavior.getClass() != BehaviorDefaultDispenseItem.class)
++            {
++                idispensebehavior.dispense(par4IBlockSource, ev.toDispense);
++                return false;
++            }
++            
++
++        }
++        
+         par0World.spawnEntityInWorld(var11);
++        return true;
+     }
+ 
+     /**

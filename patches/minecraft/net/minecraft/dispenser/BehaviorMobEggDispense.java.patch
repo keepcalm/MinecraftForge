@@ -1,0 +1,41 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorMobEggDispense.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorMobEggDispense.java
+@@ -1,9 +1,13 @@
+ package net.minecraft.dispenser;
+ 
++import net.minecraft.block.BlockDispenser;
+ import net.minecraft.item.ItemMonsterPlacer;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
+ 
+ public class BehaviorMobEggDispense extends BehaviorDefaultDispenseItem
+ {
+@@ -24,7 +28,23 @@
+         double var4 = par1IBlockSource.getX() + (double)var3.getFrontOffsetX();
+         double var6 = (double)((float)par1IBlockSource.getYInt() + 0.2F);
+         double var8 = par1IBlockSource.getZ() + (double)var3.getFrontOffsetZ();
+-        ItemMonsterPlacer.spawnCreature(par1IBlockSource.getWorld(), par2ItemStack.getItemDamage(), var4, var6, var8);
++        BlockDispenseEvent ev = new BlockDispenseEvent(par1IBlockSource.getXInt(), par1IBlockSource.getYInt(), par1IBlockSource.getZInt(), par1IBlockSource.getWorld(), par2ItemStack, Vec3.vec3dPool.getVecFromPool(var4, var6, var8), this);
++        
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return par2ItemStack;
++            }
++            
++            if (!(ev.toDispense.getItem() instanceof ItemMonsterPlacer)) {
++                super.dispense(par1IBlockSource, ev.toDispense);
++                return par2ItemStack;
++            }
++            
++            var4 = ev.velocity.xCoord;
++            var6 = ev.velocity.yCoord;
++            var8 = ev.velocity.zCoord;
++        }
++        ItemMonsterPlacer.spawnCreature(par1IBlockSource.getWorld(), ev.toDispense.getItemDamage(), var4, var6, var8);
+         par2ItemStack.splitStack(1);
+         return par2ItemStack;
+     }

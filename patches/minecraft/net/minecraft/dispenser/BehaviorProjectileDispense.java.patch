@@ -1,0 +1,35 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorProjectileDispense.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorProjectileDispense.java
+@@ -5,7 +5,10 @@
+ import net.minecraft.entity.IProjectile;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
+ import net.minecraft.world.World;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
+ 
+ public abstract class BehaviorProjectileDispense extends BehaviorDefaultDispenseItem
+ {
+@@ -17,8 +20,20 @@
+         World var3 = par1IBlockSource.getWorld();
+         IPosition var4 = BlockDispenser.func_82525_a(par1IBlockSource);
+         EnumFacing var5 = EnumFacing.getFront(par1IBlockSource.func_82620_h());
++        BlockDispenseEvent ev = new BlockDispenseEvent(par1IBlockSource.getXInt(), par1IBlockSource.getYInt(), par1IBlockSource.getZInt(), par1IBlockSource.getWorld(), par2ItemStack, Vec3.vec3dPool.getVecFromPool((double)var5.getFrontOffsetX(), 0.10000000149011612D, (double)var5.getFrontOffsetZ()), this);
++        
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return par2ItemStack;
++            }
++            
++            if (!ev.toDispense.getItem().equals(par2ItemStack.getItem())) {
++                super.dispense(par1IBlockSource, ev.toDispense);
++                return par2ItemStack;
++            }
++        }
+         IProjectile var6 = this.getProjectileEntity(var3, var4);
+-        var6.setThrowableHeading((double)var5.getFrontOffsetX(), 0.10000000149011612D, (double)var5.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
++        var6.setThrowableHeading(ev.velocity.xCoord, ev.velocity.yCoord, ev.velocity.zCoord, this.func_82500_b(), this.func_82498_a());
+         var3.spawnEntityInWorld((Entity)var6);
+         par2ItemStack.splitStack(1);
+         return par2ItemStack;

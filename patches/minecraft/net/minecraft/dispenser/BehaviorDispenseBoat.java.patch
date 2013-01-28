@@ -1,0 +1,40 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorDispenseBoat.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorDispenseBoat.java
+@@ -1,11 +1,15 @@
+ package net.minecraft.dispenser;
+ 
++import net.minecraft.block.BlockDispenser;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.entity.item.EntityBoat;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
+ import net.minecraft.world.World;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
+ 
+ public class BehaviorDispenseBoat extends BehaviorDefaultDispenseItem
+ {
+@@ -50,7 +54,20 @@
+ 
+             var15 = 0.0D;
+         }
+-
++        
++        BlockDispenseEvent ev = new BlockDispenseEvent(par1IBlockSource.getXInt(), par1IBlockSource.getYInt(), par1IBlockSource.getZInt(), par1IBlockSource.getWorld(), par2ItemStack, Vec3.vec3dPool.getVecFromPool(var5, var7 + var15, var9), this);
++        
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return par2ItemStack;
++            }
++            
++            if (!ev.toDispense.getItem().equals(par2ItemStack.getItem())) {
++                super.dispense(par1IBlockSource, ev.toDispense);
++                return par2ItemStack;
++            }
++        }
++        
+         EntityBoat var17 = new EntityBoat(var4, var5, var7 + var15, var9);
+         var4.spawnEntityInWorld(var17);
+         par2ItemStack.splitStack(1);

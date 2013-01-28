@@ -18,7 +18,7 @@
  import net.minecraft.entity.item.EntityItem;
  import net.minecraft.entity.item.EntityXPOrb;
  import net.minecraft.entity.player.EntityPlayer;
-@@ -24,17 +28,27 @@
+@@ -24,17 +28,28 @@
  import net.minecraft.item.ItemSlab;
  import net.minecraft.item.ItemStack;
  import net.minecraft.stats.StatList;
@@ -35,6 +35,7 @@
 +import net.minecraft.world.WorldProviderEnd;
 +
 +import net.minecraftforge.common.*;
++import net.minecraftforge.event.block.BlockDropExpEvent;
 +import static net.minecraftforge.common.ForgeDirection.*;
  
  public class Block
@@ -46,7 +47,7 @@
      /**
       * used as foreach item, if item.tab = current tab, display it on the screen
       */
-@@ -321,6 +335,7 @@
+@@ -321,6 +336,7 @@
              lightOpacity[par1] = this.isOpaqueCube() ? 255 : 0;
              canBlockGrass[par1] = !par2Material.getCanBlockGrass();
          }
@@ -54,7 +55,7 @@
      }
  
      /**
-@@ -459,9 +474,10 @@
+@@ -459,9 +475,10 @@
          return this.needsRandomTick;
      }
  
@@ -66,7 +67,7 @@
      }
  
      /**
-@@ -484,7 +500,7 @@
+@@ -484,7 +501,7 @@
       */
      public float getBlockBrightness(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
      {
@@ -75,7 +76,7 @@
      }
  
      @SideOnly(Side.CLIENT)
-@@ -494,7 +510,7 @@
+@@ -494,7 +511,7 @@
       */
      public int getMixedBrightnessForBlock(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
      {
@@ -84,7 +85,7 @@
      }
  
      @SideOnly(Side.CLIENT)
-@@ -639,7 +655,13 @@
+@@ -639,7 +656,13 @@
      /**
       * ejects contained items into the world, and notifies neighbours of an update, as appropriate
       */
@@ -99,7 +100,7 @@
  
      /**
       * Returns the quantity of items to drop on block destruction.
-@@ -663,8 +685,7 @@
+@@ -663,8 +686,7 @@
       */
      public float getPlayerRelativeBlockHardness(EntityPlayer par1EntityPlayer, World par2World, int par3, int par4, int par5)
      {
@@ -109,7 +110,7 @@
      }
  
      /**
-@@ -682,18 +703,13 @@
+@@ -682,18 +704,13 @@
      {
          if (!par1World.isRemote)
          {
@@ -132,7 +133,19 @@
                  }
              }
          }
-@@ -1081,7 +1097,7 @@
+@@ -721,6 +738,11 @@
+      */
+     protected void dropXpOnBlockBreak(World par1World, int par2, int par3, int par4, int par5)
+     {
++        BlockDropExpEvent ev = new BlockDropExpEvent(par2, par3, par4, par1World, par5);
++        if (MinecraftForge.EVENT_BUS.post(ev)) {
++            return;
++        }
++        par5 = ev.amountOfExpToDrop;
+         if (!par1World.isRemote)
+         {
+             while (par5 > 0)
+@@ -1081,7 +1103,7 @@
          par2EntityPlayer.addStat(StatList.mineBlockStatArray[this.blockID], 1);
          par2EntityPlayer.addExhaustion(0.025F);
  
@@ -141,7 +154,7 @@
          {
              ItemStack var8 = this.createStackedBlock(par6);
  
-@@ -1364,4 +1380,840 @@
+@@ -1364,4 +1386,840 @@
          canBlockGrass[0] = true;
          StatList.initBreakableStats();
      }

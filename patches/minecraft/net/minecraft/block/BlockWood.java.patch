@@ -1,0 +1,10 @@
+--- ../src_base/minecraft/net/minecraft/block/BlockWood.java
++++ ../src_work/minecraft/net/minecraft/block/BlockWood.java
+@@ -6,6 +6,7 @@
+ import net.minecraft.block.material.Material;
+ import net.minecraft.creativetab.CreativeTabs;
+ import net.minecraft.item.ItemStack;
++import net.minecraft.world.World;
+ 
+ public class BlockWood extends Block
+ {

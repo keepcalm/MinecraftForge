@@ -1,0 +1,32 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorDispenseFireball.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorDispenseFireball.java
+@@ -6,7 +6,10 @@
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
+ import net.minecraft.world.World;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
+ 
+ public class BehaviorDispenseFireball extends BehaviorDefaultDispenseItem
+ {
+@@ -32,6 +35,18 @@
+         double var13 = var12.nextGaussian() * 0.05D + (double)var3.getFrontOffsetX();
+         double var15 = var12.nextGaussian() * 0.05D;
+         double var17 = var12.nextGaussian() * 0.05D + (double)var3.getFrontOffsetZ();
++        BlockDispenseEvent ev = new BlockDispenseEvent(par1IBlockSource.getXInt(), par1IBlockSource.getYInt(), par1IBlockSource.getZInt(), par1IBlockSource.getWorld(), par2ItemStack, Vec3.vec3dPool.getVecFromPool(var13, var15, var17), this);
++        
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return par2ItemStack;
++            }
++            
++            if (!ev.toDispense.getItem().equals(par2ItemStack.getItem())) {
++                super.dispense(par1IBlockSource, ev.toDispense);
++                return par2ItemStack;
++            }
++        }
+         var11.spawnEntityInWorld(new EntitySmallFireball(var11, var5, var7, var9, var13, var15, var17));
+         par2ItemStack.splitStack(1);
+         return par2ItemStack;

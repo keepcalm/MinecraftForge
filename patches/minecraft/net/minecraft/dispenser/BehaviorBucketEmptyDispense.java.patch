@@ -1,0 +1,57 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorBucketEmptyDispense.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorBucketEmptyDispense.java
+@@ -1,12 +1,18 @@
+ package net.minecraft.dispenser;
+ 
++import net.minecraft.block.BlockDispenser;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.item.Item;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.tileentity.TileEntityDispenser;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
+ import net.minecraft.world.World;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
++import net.minecraftforge.liquids.LiquidContainerRegistry;
++import net.minecraftforge.liquids.LiquidDictionary;
+ 
+ public class BehaviorBucketEmptyDispense extends BehaviorDefaultDispenseItem
+ {
+@@ -31,10 +37,26 @@
+         int var5 = par1IBlockSource.getXInt() + var3.getFrontOffsetX();
+         int var6 = par1IBlockSource.getYInt();
+         int var7 = par1IBlockSource.getZInt() + var3.getFrontOffsetZ();
+-        Material var8 = var4.getBlockMaterial(var5, var6, var7);
++
+         int var9 = var4.getBlockMetadata(var5, var6, var7);
+         Item var10;
+ 
++        BlockDispenseEvent ev = new BlockDispenseEvent(par1IBlockSource.getXInt(), par1IBlockSource.getYInt(), par1IBlockSource.getZInt(), par1IBlockSource.getWorld(), par2ItemStack, Vec3.vec3dPool.getVecFromPool(0D, 0D, 0D), this);
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return par2ItemStack;
++            }
++            BlockDispenser.eventFired = true;
++            
++            if (!LiquidContainerRegistry.isContainer(ev.toDispense)) {
++                return super.dispense(par1IBlockSource, par2ItemStack);
++            }
++            else {
++                par2ItemStack = ev.toDispense;
++            }
++        }
++
++        Material var8 = var4.getBlockMaterial(var5, var6, var7);
+         if (Material.water.equals(var8) && var9 == 0)
+         {
+             var10 = Item.bucketWater;
+@@ -48,6 +70,7 @@
+ 
+             var10 = Item.bucketLava;
+         }
++
+ 
+         var4.setBlockWithNotify(var5, var6, var7, 0);
+ 

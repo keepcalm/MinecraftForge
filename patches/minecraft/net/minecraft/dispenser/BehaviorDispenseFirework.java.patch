@@ -1,0 +1,44 @@
+--- ../src_base/minecraft/net/minecraft/dispenser/BehaviorDispenseFirework.java
++++ ../src_work/minecraft/net/minecraft/dispenser/BehaviorDispenseFirework.java
+@@ -1,9 +1,14 @@
+ package net.minecraft.dispenser;
+ 
++import net.minecraft.block.BlockDispenser;
+ import net.minecraft.entity.item.EntityFireworkRocket;
++import net.minecraft.item.ItemFirework;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.util.EnumFacing;
++import net.minecraft.util.Vec3;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockDispenseEvent;
+ 
+ public class BehaviorDispenseFirework extends BehaviorDefaultDispenseItem
+ {
+@@ -23,6 +28,26 @@
+         double var4 = par1IBlockSource.getX() + (double)var3.getFrontOffsetX();
+         double var6 = (double)((float)par1IBlockSource.getYInt() + 0.2F);
+         double var8 = par1IBlockSource.getZ() + (double)var3.getFrontOffsetZ();
++        
++        BlockDispenseEvent ev = new BlockDispenseEvent(par1IBlockSource.getXInt(), par1IBlockSource.getYInt(), par1IBlockSource.getZInt(), par1IBlockSource.getWorld(), par2ItemStack, Vec3.vec3dPool.getVecFromPool(var4, var6, var8), this);
++        
++        if (!BlockDispenser.eventFired) {
++            if (MinecraftForge.EVENT_BUS.post(ev)) {
++                return par2ItemStack;
++            }
++            
++            if (!(ev.toDispense.getItem() instanceof ItemFirework)) {
++                super.dispense(par1IBlockSource, ev.toDispense);
++                return par2ItemStack;
++            }
++            
++            par2ItemStack = ev.toDispense;
++            
++            var4 = ev.velocity.xCoord;
++            var6 = ev.velocity.yCoord;
++            var8 = ev.velocity.zCoord;
++        }
++        
+         EntityFireworkRocket var10 = new EntityFireworkRocket(par1IBlockSource.getWorld(), var4, var6, var8, par2ItemStack);
+         par1IBlockSource.getWorld().spawnEntityInWorld(var10);
+         par2ItemStack.splitStack(1);
