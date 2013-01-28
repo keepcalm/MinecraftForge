@@ -1,6 +1,16 @@
 --- ../src_base/minecraft/net/minecraft/inventory/Slot.java
 +++ ../src_work/minecraft/net/minecraft/inventory/Slot.java
-@@ -21,6 +21,12 @@
+@@ -4,6 +4,9 @@
+ import cpw.mods.fml.relauncher.SideOnly;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.item.ItemStack;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.Event.Result;
++import net.minecraftforge.event.inventory.SlotTakeStackEvent;
+ 
+ public class Slot
+ {
+@@ -21,6 +24,12 @@
  
      /** display position of the inventory slot on the screen y axis */
      public int yDisplayPosition;
@@ -13,7 +23,20 @@
  
      public Slot(IInventory par1IInventory, int par2, int par3, int par4)
      {
-@@ -147,6 +153,44 @@
+@@ -137,6 +146,12 @@
+      */
+     public boolean canTakeStack(EntityPlayer par1EntityPlayer)
+     {
++        SlotTakeStackEvent ev = new SlotTakeStackEvent(this, par1EntityPlayer);
++        MinecraftForge.EVENT_BUS.post(ev);
++        if (ev.getResult().equals(Result.DENY)) {
++            return false;
++        }
++        
+         return true;
+     }
+ 
+@@ -147,6 +162,44 @@
       */
      public int getBackgroundIconIndex()
      {
