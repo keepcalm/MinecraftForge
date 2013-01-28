@@ -1,0 +1,20 @@
+--- ../src_base/minecraft/net/minecraft/block/BlockDispenser.java
++++ ../src_work/minecraft/net/minecraft/block/BlockDispenser.java
+@@ -30,6 +30,9 @@
+     public static final IRegistry dispenseBehaviorRegistry = new RegistryDefaulted(new BehaviorDefaultDispenseItem());
+     private Random random = new Random();
+ 
++    /** Used when posting BlockDispenseEvents to check for more than one event per dispense. */
++    public static boolean eventFired;
++    
+     protected BlockDispenser(int par1)
+     {
+         super(par1, Material.rock);
+@@ -173,6 +176,7 @@
+                 if (var9 != IBehaviorDispenseItem.itemDispenseBehaviorProvider)
+                 {
+                     ItemStack var10 = var9.dispense(var5, var8);
++                    eventFired = false;
+                     var6.setInventorySlotContents(var7, var10.stackSize == 0 ? null : var10);
+                 }
+             }
