@@ -1,16 +1,18 @@
 --- ../src_base/minecraft/net/minecraft/block/BlockFire.java
 +++ ../src_work/minecraft/net/minecraft/block/BlockFire.java
-@@ -9,6 +9,9 @@
+@@ -9,6 +9,11 @@
  import net.minecraft.world.World;
  import net.minecraft.world.WorldProviderEnd;
  
 +import net.minecraftforge.common.ForgeDirection;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.BlockBurnEvent;
 +import static net.minecraftforge.common.ForgeDirection.*;
 +
  public class BlockFire extends Block
  {
      /** The chance this block will encourage nearby blocks to catch on fire */
-@@ -32,6 +35,8 @@
+@@ -32,6 +37,8 @@
       */
      public void initializeBlock()
      {
@@ -19,7 +21,7 @@
          this.setBurnRate(Block.planks.blockID, 5, 20);
          this.setBurnRate(Block.woodDoubleSlab.blockID, 5, 20);
          this.setBurnRate(Block.woodSingleSlab.blockID, 5, 20);
-@@ -56,8 +61,7 @@
+@@ -56,8 +63,7 @@
       */
      private void setBurnRate(int par1, int par2, int par3)
      {
@@ -29,7 +31,7 @@
      }
  
      /**
-@@ -117,12 +121,8 @@
+@@ -117,12 +123,8 @@
      {
          if (par1World.getGameRules().getGameRuleBooleanValue("doFireTick"))
          {
@@ -44,7 +46,7 @@
  
              if (!this.canPlaceBlockAt(par1World, par2, par3, par4))
              {
-@@ -151,7 +151,7 @@
+@@ -151,7 +153,7 @@
                          par1World.setBlockWithNotify(par2, par3, par4, 0);
                      }
                  }
@@ -53,7 +55,7 @@
                  {
                      par1World.setBlockWithNotify(par2, par3, par4, 0);
                  }
-@@ -165,12 +165,12 @@
+@@ -165,12 +167,12 @@
                          var9 = -50;
                      }
  
@@ -72,7 +74,7 @@
  
                      for (int var10 = par2 - 1; var10 <= par2 + 1; ++var10)
                      {
-@@ -224,9 +224,20 @@
+@@ -224,9 +226,20 @@
          return false;
      }
  
@@ -94,7 +96,19 @@
  
          if (par6Random.nextInt(par5) < var8)
          {
-@@ -260,7 +271,12 @@
+@@ -240,7 +253,10 @@
+                 {
+                     var10 = 15;
+                 }
+-
++                
++                if (MinecraftForge.EVENT_BUS.post(new BlockBurnEvent(par2, par3, par4, par1World))) {
++                    return;
++                }
+                 par1World.setBlockAndMetadataWithNotify(par2, par3, par4, this.blockID, var10);
+             }
+             else
+@@ -260,7 +276,12 @@
       */
      private boolean canNeighborBurn(World par1World, int par2, int par3, int par4)
      {
@@ -108,7 +122,7 @@
      }
  
      /**
-@@ -276,12 +292,12 @@
+@@ -276,12 +297,12 @@
          }
          else
          {
@@ -127,7 +141,7 @@
              return var6;
          }
      }
-@@ -296,21 +312,24 @@
+@@ -296,21 +317,24 @@
  
      /**
       * Checks the specified block coordinate to see if it can catch fire.  Args: blockAccess, x, y, z
@@ -157,7 +171,7 @@
      }
  
      /**
-@@ -368,9 +387,9 @@
+@@ -368,9 +392,9 @@
          float var8;
          float var9;
  
@@ -170,7 +184,7 @@
              {
                  for (var6 = 0; var6 < 2; ++var6)
                  {
-@@ -381,7 +400,7 @@
+@@ -381,7 +405,7 @@
                  }
              }
  
@@ -179,7 +193,7 @@
              {
                  for (var6 = 0; var6 < 2; ++var6)
                  {
-@@ -392,7 +411,7 @@
+@@ -392,7 +416,7 @@
                  }
              }
  
@@ -188,7 +202,7 @@
              {
                  for (var6 = 0; var6 < 2; ++var6)
                  {
-@@ -403,7 +422,7 @@
+@@ -403,7 +427,7 @@
                  }
              }
  
@@ -197,7 +211,7 @@
              {
                  for (var6 = 0; var6 < 2; ++var6)
                  {
-@@ -414,7 +433,7 @@
+@@ -414,7 +438,7 @@
                  }
              }
  
@@ -206,7 +220,7 @@
              {
                  for (var6 = 0; var6 < 2; ++var6)
                  {
-@@ -436,4 +455,46 @@
+@@ -436,4 +460,46 @@
              }
          }
      }
