@@ -1,0 +1,28 @@
+--- ../src_base/minecraft/net/minecraft/tileentity/TileEntityNote.java
++++ ../src_work/minecraft/net/minecraft/tileentity/TileEntityNote.java
+@@ -4,6 +4,8 @@
+ import net.minecraft.block.material.Material;
+ import net.minecraft.nbt.NBTTagCompound;
+ import net.minecraft.world.World;
++import net.minecraftforge.common.MinecraftForge;
++import net.minecraftforge.event.block.NotePlayEvent;
+ 
+ public class TileEntityNote extends TileEntity
+ {
+@@ -79,8 +81,14 @@
+             {
+                 var6 = 4;
+             }
+-
+-            par1World.addBlockEvent(par2, par3, par4, Block.music.blockID, var6, this.note);
++            
++            NotePlayEvent ev = new NotePlayEvent(par2, par3, par4, par1World, this.note, var6);
++            if (MinecraftForge.EVENT_BUS.post(ev))
++            {
++                return;
++            }
++            
++            par1World.addBlockEvent(par2, par3, par4, Block.music.blockID, ev.instrument.id, ev.note);
+         }
+     }
+ }
